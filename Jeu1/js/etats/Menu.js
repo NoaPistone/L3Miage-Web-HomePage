@@ -31,7 +31,7 @@ export default class Menu {
         this.ctx.shadowBlur = 10;
         this.ctx.fillText("JEU CANVAS", this.canvas.width / 2, 150);
         this.ctx.fillStyle = "#b968d3";
-        //this.ctx.shadowBlur = 5; // moins d'ombre
+        //this.ctx.shadowBlur = 5; 
         //this.ctx.font = "24px 'Verdana', sans-serif";
         //this.ctx.fillText("Arrivez à la sortie et gagnez !", this.canvas.width / 2, 210);
         this.ctx.fillRect(
@@ -65,7 +65,7 @@ export default class Menu {
             my > this.bouton.y &&
             my < this.bouton.y + this.bouton.h
         ) {
-            console.log("BOUTON OK → PLAY");
+            console.log("bouton touché pour jouer appuyer");
             this.jeux.init();
             this.jeux.etat = "JEU EN COURS";
         }

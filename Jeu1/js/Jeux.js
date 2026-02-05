@@ -5,6 +5,7 @@ import Sortie from "./Sortie.js";
 import { initListeners } from "./ecouteurs.js";
 import { drawScore } from "./utils.js";
 import Menu from "./etats/menu.js";
+import GameOver from "./etats/gameOver.js";
 
 
 
@@ -27,10 +28,11 @@ export default class Jeux {
         this.niveau = 1; //1
         this.etat = "MENU";
         //this.etat = "JEU EN COURS";
-        this.menu = new Menu(this.canvas,this.ctx,this);
+        this.menu = new Menu(this.canvas, this.ctx, this);
+        this.fin = new GameOver(this.canvas, this.ctx, this);
         this.pieceMessageTimer = 0;
 
-        
+
     }
 
     init() {
@@ -57,43 +59,42 @@ export default class Jeux {
             this.pieceMessageTimer = Date.now();
             this.sortieActive = false;
 
-            this.obstacles.push(new Obstacle(141, 0,   33, 439, "black"));
+            this.obstacles.push(new Obstacle(141, 0, 33, 439, "black"));
             this.obstacles.push(new Obstacle(331, 141, 33, 497, "black"));
             this.obstacles.push(new Obstacle(456, 414, 166, 33, "black"));
-            this.obstacles.push(new Obstacle(249, 17,  249, 33, "black"));
+            this.obstacles.push(new Obstacle(249, 17, 249, 33, "black"));
             this.obstacles.push(new Obstacle(414, 166, 124, 33, "black", "horizontal", 2, 348, 580));
             this.obstacles.push(new Obstacle(83, 505, 249, 33, "black"));
             this.pieces.push(new Piece(166, 456, 17, 17, "yellow"));
             this.pieces.push(new Piece(124, 133, 17, 17, "yellow"));
-            this.pieces.push(new Piece(555, 17,  17, 17, "yellow"));
+            this.pieces.push(new Piece(555, 17, 17, 17, "yellow"));
             this.pieces.push(new Piece(555, 398, 17, 17, "yellow"));
             this.pieces.push(new Piece(249, 555, 17, 17, "yellow"));
 
-            
-            this.sortie = new Sortie(580,580,120,120,"white");
-            
+
+            this.sortie = new Sortie(500, 500, 120, 120, "white");
+
         }
 
         if (niveau == 2) {
-            this.obstacles.push(new Obstacle(100, 0, 30, 300, "black","vertical",3,0,450)); 
-            this.obstacles.push(new Obstacle(0, 550, 550, 30, "black")); 
-            this.obstacles.push(new Obstacle(100, 300, 350, 30, "black")); 
-            this.obstacles.push(new Obstacle(0, 430, 450, 30, "black","horizontal",2,0,550)); 
-            this.obstacles.push(new Obstacle(210, 180, 470, 30, "black",'horizontal',2,100,700));
-            this.obstacles.push(new Obstacle(550, 180, 40, 400, "black",'vertical',2,180,700)); 
-            this.obstacles.push(new Obstacle(230, 90, 400, 20, "black"));
-            this.obstacles.push(new Obstacle(130, 680, 510, 30, "black","horizontal",1,120,700));
+            this.obstacles.push(new Obstacle(83, 0, 25, 248, "black", "vertical", 3, 0, 373));
+            this.obstacles.push(new Obstacle(0, 456, 456, 25, "black"));
+            this.obstacles.push(new Obstacle(83, 248, 290, 25, "black"));
+            this.obstacles.push(new Obstacle(0, 356, 373, 25, "black", "horizontal", 2, 0, 456));
+            this.obstacles.push(new Obstacle(174, 149, 389, 25, "black", 'horizontal', 2, 83, 580));
+            this.obstacles.push(new Obstacle(456, 149, 33, 331, "black", 'vertical', 2, 149, 580));
+            this.obstacles.push(new Obstacle(191, 75, 331, 17, "black"));
+            this.obstacles.push(new Obstacle(108, 564, 422, 25, "black", "horizontal", 1, 100, 580));
+            this.pieces.push(new Piece(555, 25, 17, 17, "yellow"));
+            this.pieces.push(new Piece(414, 124, 17, 17, "yellow"));
+            this.pieces.push(new Piece(124, 331, 17, 17, "yellow"));
+            this.pieces.push(new Piece(439, 199, 17, 17, "yellow"));
+            this.pieces.push(new Piece(555, 564, 17, 17, "yellow"));
+            this.pieces.push(new Piece(41, 414, 17, 17, "yellow"));
 
-            this.pieces.push(new Piece(670, 30, 20, 20, "yellow"));   
-            this.pieces.push(new Piece(500, 150, 20, 20, "yellow"));  
-            this.pieces.push(new Piece(150, 400, 20, 20, "yellow"));  
-            this.pieces.push(new Piece(530, 240, 20, 20, "yellow"));  
-            this.pieces.push(new Piece(670, 680, 20, 20, "yellow"));
-            this.pieces.push(new Piece(50, 500, 20, 20, "yellow"));
-            // Ajoute l'ennemie plus tard et faire une class
-            // this.ennemis = [new Ennemi(300,300)];
+            // Sortie
+            this.sortie = new Sortie(0, 481, 99, 99, "white");
 
-            this.sortie = new Sortie(0,580,120,120,"white");
         }
 
         /*if (niveau == 3) {
@@ -101,7 +102,7 @@ export default class Jeux {
         }*/
     }
 
-    
+
     start() {
         console.log("Jeu demarré");
         this.etat = "MENU D'ACCUEIL";
@@ -113,51 +114,58 @@ export default class Jeux {
     }
 
     AnimationLoop() {
-        this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         if (this.etat === "MENU D'ACCUEIL") {
             this.menu.draw();
         } else if (this.etat === "JEU EN COURS") {
             this.update();
             this.drawObjets();
+        } else if (this.etat === "GAME OVER") {
+            this.fin.draw();
         }
 
-        
+
         requestAnimationFrame(this.AnimationLoop.bind(this));
     }
 
-    
+
 
     update() {
-        this.obstacles.forEach(o => o.update && o.update());
-        
+        this.obstacles.forEach(objet => {
+            objet.update();
+        });
         this.deplacementJoueur();
         this.collisionObstacle();
         this.collisionPieces();
         this.collisionSortie();
+        if(this.vies <= 0) {
+            this.etat = "GAME OVER";
+            console.log("jeu terminé");
+        }
     }
 
     deplacementJoueur() {
         this.joueur.vx = 0;
         this.joueur.vy = 0;
 
-        
-       if(this.inputStates.ArrowRight) {
+
+        if (this.inputStates.ArrowRight) {
             this.joueur.vx = 6;
-        } 
-        if(this.inputStates.ArrowLeft) {
+        }
+        if (this.inputStates.ArrowLeft) {
             this.joueur.vx = -6;
-        } 
+        }
 
-        if(this.inputStates.ArrowUp) {
+        if (this.inputStates.ArrowUp) {
             this.joueur.vy = -6;
-        } 
+        }
 
-        if(this.inputStates.ArrowDown) {
+        if (this.inputStates.ArrowDown) {
             this.joueur.vy = 6;
-        } 
+        }
 
         if (this.joueur.vx !== 0 || this.joueur.vy !== 0) {
-        this.joueur.angle = Math.atan2(this.joueur.vy, this.joueur.vx);
+            this.joueur.angle = Math.atan2(this.joueur.vy, this.joueur.vx);
         }
 
         this.joueur.move();
@@ -176,7 +184,7 @@ export default class Jeux {
         this.drawScore();
         if (this.showPieceMessage) {
             let elapsed = Date.now() - this.pieceMessageTimer;
-            if (elapsed > 2000) {  // 10 secondes
+            if (elapsed > 2000) {  
                 this.showPieceMessage = false;
             } else {
                 let rectWidth = 500;
@@ -184,12 +192,12 @@ export default class Jeux {
                 let rectX = (this.canvas.width - rectWidth) / 2;
                 let rectY = (this.canvas.height - rectHeight) / 2;
 
-            // Dessiner le rectangle blanc
+                
                 this.ctx.save();
                 this.ctx.fillStyle = "white";
                 this.ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
 
-        // Dessiner le texte noir centré
+                
                 this.ctx.fillStyle = "black";
                 this.ctx.font = "20px Arial";
                 this.ctx.textAlign = "center";
@@ -199,19 +207,11 @@ export default class Jeux {
                 this.ctx.restore();
             }
         }
-        /*this.joueur.draw(this.ctx);
-        this.sortie.draw(this.ctx);
-        this.obstacles.forEach(obj => {
-            obj.draw(this.ctx);
-        });
-        this.pieces.forEach(obj => {
-            obj.draw(this.ctx);
-        });
-        this.drawScore();*/
+        
     }
 
     drawScore() {
-        drawScore(this.ctx,this.canvas,this.score,this.niveau,this.vies);
+        drawScore(this.ctx, this.canvas, this.score, this.niveau, this.vies);
     }
 
     CollisionBordsEcran() {
@@ -237,15 +237,15 @@ export default class Jeux {
             this.joueur.vy = 0;
         }
     }
-  
+
     collisionObstacle() {
         this.obstacles.forEach(obstacle => {
-            if(obstacle.estAtteint(this.joueur)) {
-                this.vies --;
+            if (obstacle.estAtteint(this.joueur)) {
+                this.vies--;
                 this.joueur.x = 30;
                 this.joueur.y = 30;
 
-                console.log("Obstacle touché, vies restante :", this.vies, "score :",this.score);
+                console.log("Obstacle touché, vies restante :", this.vies, "score :", this.score);
             }
         });
     }
@@ -255,7 +255,7 @@ export default class Jeux {
             if (piece.estAtteint(this.joueur)) {
                 this.score += 10;
                 //Re mettre les pieces aussi 
-                console.log("Piece attrapée, score :",this.score);
+                console.log("Piece attrapée, score :", this.score);
                 return false;
             }
             return true;
@@ -263,7 +263,7 @@ export default class Jeux {
 
         if (this.niveau === 1 && this.pieces.length === 0) {
             this.sortieActive = true;
-            this.showPieceMessage = false; 
+            this.showPieceMessage = false;
         }
     }
 
@@ -271,12 +271,12 @@ export default class Jeux {
         if (this.sortie.estAtteint(this.joueur)) {
             if (this.niveau === 1 && !this.sortieActive) {
                 console.log("Vous devez d'abord collecter toutes les pièces !");
-                return; 
+                return;
             }
             console.log("Sortie atteinte");
             this.niveau++;
             console.log("niveau :", this.niveau);
-            
+
             this.joueur.x = 30;
             this.joueur.y = 30;
             this.objetNiveau(this.niveau);

@@ -67,6 +67,7 @@ export default class Menu {
         ) {
             console.log("bouton touché pour jouer appuyer");
             this.jeux.init();
+            this.jeux.demarrerTimer();
             this.jeux.etat = "JEU EN COURS";
         }
     }

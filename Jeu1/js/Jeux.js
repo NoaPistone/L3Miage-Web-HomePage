@@ -8,6 +8,7 @@ import Ennemi from "./objetsJeu/Ennemi.js";
 import Menu from "./etats/menu.js";
 import GameOver from "./etats/GameOver.js";
 import BtnDebloqueSortie from "./objetsJeu/BtnDebloqueSortie.js";
+import JeuTermine from "./etats/JeuTermine.js";
 
 let debug = 3;
 
@@ -41,6 +42,7 @@ export default class Jeux {
         //this.etat = "JEU EN COURS";
         this.menu = new Menu(this.canvas, this.ctx, this);
         this.fin = new GameOver(this.canvas, this.ctx, this);
+        this.JeuTermine = new JeuTermine(this.canvas,this.ctx,this);
         this.pieceMessageTimer = 0;
 
         //Pour l'instant j'arrive à le faire fonctionner dans ecouteurs.js mais à long terme faudra mettre la bas
@@ -69,7 +71,7 @@ export default class Jeux {
         this.objetNiveau(niveauActuel);
         this.score = 0;
         this.vies = 5;
-        this.niveau =1; //1
+        this.niveau = 1; //1
         console.log("Jeu initialisé");
     }
 
@@ -193,74 +195,8 @@ export default class Jeux {
 
             this.sortie = new Sortie(10, 140, 80, 80);
             this.btn = new BtnDebloqueSortie(500, 500, 30, 30, "#ffa500");
-            this.ennemis.push(new Ennemi(300, 200, 30, 30, "red", 250, 2,5));
+            this.ennemis.push(new Ennemi(300, 200, 30, 30, "red", 250, 2, 5));
         }
-
-
-
-
-        //mettre ca pour plus tard 
-        /*if (niveau == 1) {
-            console.log("création obstacles/pièces de niveau 1");
-            this.sortieActive = false;
-
-            this.obstacles.push(new Obstacle(141, 0, 33, 439, "black"));
-            this.obstacles.push(new Obstacle(331, 141, 33, 497, "black"));
-            this.obstacles.push(new Obstacle(456, 414, 166, 33, "black"));
-            this.obstacles.push(new Obstacle(249, 17, 249, 33, "black"));
-            this.obstacles.push(new Obstacle(414, 166, 124, 33, "black", "horizontal", 2, 348, 580));
-            this.obstacles.push(new Obstacle(83, 505, 249, 33, "black"));
-            addPiece(166, 456, 17, 17, "yellow");
-            addPiece(124, 133, 17, 17, "yellow");
-            addPiece(555, 17, 17, 17, "yellow");
-            addPiece(555, 398, 17, 17, "yellow");
-            addPiece(249, 555, 17, 17, "yellow");
-
-
-            const size = 120;
-            this.sortie = new Sortie(this.canvas.width - size, this.canvas.height - size, size, size);
-
-
-
-        }
-
-        if (niveau == 2) {
-            this.obstacles.push(new Obstacle(83, 0, 25, 248, "black", "vertical", 3, 0, 373));
-            this.obstacles.push(new Obstacle(0, 456, 456, 25, "black"));
-            this.obstacles.push(new Obstacle(83, 248, 290, 25, "black"));
-            this.obstacles.push(new Obstacle(0, 356, 373, 25, "black", "horizontal", 2, 0, 456));
-            this.obstacles.push(new Obstacle(174, 149, 389, 25, "black", 'horizontal', 2, 83, 580));
-            this.obstacles.push(new Obstacle(456, 149, 33, 331, "black", 'vertical', 2, 149, 580));
-            this.obstacles.push(new Obstacle(191, 75, 331, 17, "black"));
-            this.obstacles.push(new Obstacle(108, 564, 422, 25, "black", "horizontal", 1, 100, 580));
-            addPiece(555, 25, 17, 17, "yellow");
-            addPiece(414, 124, 17, 17, "yellow");
-            addPiece(124, 331, 17, 17, "yellow");
-            addPiece(439, 199, 17, 17, "yellow");
-            addPiece(555, 564, 17, 17, "yellow");
-            addPiece(41, 414, 17, 17, "yellow");
-
-            // Sortie
-            this.sortie = new Sortie(0, 481, 99, 99, "white");
-
-        }
-
-        if (niveau == 3) {
-            this.obstacles.push(new Obstacle(0, 80, 300, 30, "black"));
-            this.obstacles.push(new Obstacle(100, 80, 30, 170, "black"));
-            this.obstacles.push(new Obstacle(200, 300, 300, 30, "black"));
-            this.obstacles.push(new Obstacle(0, 410, 300, 30, "black"));
-            this.obsSupp = new Obstacle(0, 250, 130, 30, "black"); 
-            this.obstacles.push(this.obsSupp);
-            addPiece(160, 135, 17, 17, "yellow");
-            addPiece(550, 50, 17, 17, "yellow");
-            addPiece(550, 550, 17, 17, "yellow");
-            addPiece(80, 550, 17, 17, "yellow");
-            addPiece(150, 300, 17, 17, "yellow");
-
-            this.sortie = new Sortie(10, 140, 80, 80);
-            this.btn = new BtnDebloqueSortie(500, 500, 30, 30, "#ffa500");
-        } */
     }
 
 
@@ -285,6 +221,8 @@ export default class Jeux {
             this.drawObjets();
         } else if (this.etat === "GAME OVER") {
             this.fin.draw();
+        } else if (this.etat=== "JEU TERMINE") {
+            this.JeuTermine.draw();
         }
 
 
@@ -326,6 +264,7 @@ export default class Jeux {
             }
 
         }
+
     }
 
     deplacementJoueur() {
@@ -464,20 +403,27 @@ export default class Jeux {
 
     collisionSortie() {
         if (this.sortie.estAtteint(this.joueur)) {
-            this.arreterTimer();
-            /*if (this.niveau === 1 && !this.sortieActive) {
-                console.log("Vous devez d'abord collecter toutes les pièces !");
-                return;
-            }*/ // mettre ca plus tard pour plus de difficulté
-            console.log("Sortie atteinte");
-            this.niveau++;
-            console.log("niveau :", this.niveau);
-            this.demarrerTimer();
+            if (this.niveau < 7) {
+                this.arreterTimer();
+                /*if (this.niveau === 1 && !this.sortieActive) {
+                    console.log("Vous devez d'abord collecter toutes les pièces !");
+                    return;
+                }*/ // mettre ca plus tard pour plus de difficulté
+                console.log("Sortie atteinte");
+                this.niveau++;
+                console.log("niveau :", this.niveau);
+                this.demarrerTimer();
 
 
-            this.joueur.x = 30;
-            this.joueur.y = 30;
-            this.objetNiveau(this.niveau);
+                this.joueur.x = 30;
+                this.joueur.y = 30;
+                this.objetNiveau(this.niveau);
+
+            } else {
+                this.arreterTimer();
+                this.etat = "JEU TERMINE";
+                console.log("jeu terminé");
+            }
         }
     }
 
